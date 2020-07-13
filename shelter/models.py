@@ -19,14 +19,16 @@ class Animals(models.Model):
     modified_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения записи')
 
     def __str__(self):
+        return self.name
+
+    def age(self):
         delta = relativedelta(datetime.now(), self.birth_date)
         if delta.years:
-            age = f'{delta.years} лет'
+            return f'{delta.years} лет'
         elif delta.months:
-            age = f'{delta.months} месяцев'
+            return f'{delta.months} месяцев'
         else:
-            age = f'{delta.days} дней'
-        return f'{self.name} ({age})'
+            return f'{delta.days} дней'
 
     class Meta:
         db_table = f'{DB_PREFIX}_animals'

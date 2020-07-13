@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+    <a href="/">Назад к списку</a>
     <h1>{{ guest }}</h1>
+    <a href="/edit/{{ guest.id }}">Изменить</a>
 {% endblock %}

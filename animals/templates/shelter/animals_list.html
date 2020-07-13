@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
     <h1>Список постояльцев</h1>
-    {% for guest in guests_list %}
-        <a href="/{{ guest.id }}/view">{{ guest }}</a>
-    {% endfor %}
+    <ul>
+        {% for guest in guests_list %}
+            <li><a href="/view/{{ guest.id }}/">{{ guest }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <a href="/add/">Добавить</a>
 {% endblock %}
