@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views import generic, View
@@ -37,7 +38,7 @@ class GuestsDetailView(generic.DetailView):
         return result
 
 
-class GuestsCreateView(View):
+class GuestsCreateView(LoginRequiredMixin, View):
     def get(self, request):
         context = {
             'animal_form': AnimalsForm(),
@@ -52,7 +53,7 @@ class GuestsCreateView(View):
         return render(request, template_name='shelter/animals_create.html', context={'animal_form': animal_form})
 
 
-class GuestsEditView(View):
+class GuestsEditView(LoginRequiredMixin, View):
     def get(self, request, animal_id):
         animal = Animals.objects.get(id=animal_id)
         context = {
@@ -76,7 +77,7 @@ class GuestsEditView(View):
         return render(request, template_name='shelter/animals_edit.html', context=context)
 
 
-class GuestsDelete(View):
+class GuestsDelete(LoginRequiredMixin, View):
     def get(self, request, animal_id):
         if request.user.username.lower() != 'admin':
             raise Http404('<h1>Page not found</h1>')
