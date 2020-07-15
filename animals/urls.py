@@ -20,7 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shelter.urls')),
-    # path('user/', include('django.contrib.auth.urls')),
     path('user/login/', views.LoginView.as_view(), name='login'),
     path('user/logout/', views.LogoutView.as_view(), name='logout'),
+    path('api/', include('shelter.urls_api')),
 ]
