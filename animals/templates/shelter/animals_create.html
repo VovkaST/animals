@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
     <a href="/">Назад к списку</a>
-    <form action="/edit/{{ animal_id }}/" method="post">
+    <form action="/create/" method="post">
         {{ animal_form.as_p }}
         {% csrf_token %}
-        <button type="submit">Сохранить</button>
-        <a href="/view/{{ animal_id }}/">Отмена</a>
+        <button type="submit">Создать</button>
     </form>
 {% endblock %}

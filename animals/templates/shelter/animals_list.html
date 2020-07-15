@@ -7,5 +7,8 @@
         {% endfor %}
     </ul>
 
-    <a href="/add/">Добавить</a>
+    {% if can_create %}
+        <a href="/create/">Добавить</a>
+    {% endif %}
+
 {% endblock %}

@@ -1,6 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
     <a href="/">Назад к списку</a>
-    <h1>{{ guest }}</h1>
-    <a href="/edit/{{ guest.id }}">Изменить</a>
+    <h1>{{ animal_form.instance.name }}</h1>
+    <table>
+        <tr>
+            <td>Возраст</td>
+            <td>{{ animal_form.instance.age }} ({{ animal_form.instance.birth_date|date:'d.m.Y' }})</td>
+        </tr>
+        <tr>
+            <td>Вес</td>
+            <td>{{ animal_form.instance.weight }} кг</td>
+        </tr>
+        <tr>
+            <td>Рост</td>
+            <td>{{ animal_form.instance.height }} см</td>
+        </tr>
+        <tr>
+            <td>Особые приметы</td>
+            <td>{{ animal_form.instance.special_signs }}</td>
+        </tr>
+        <tr>
+            <td>В приюте с</td>
+            <td>{{ animal_form.instance.arrive_date|date:'d.m.Y' }}</td>
+        </tr>
+    </table>
+    {% if can_edit %}
+        <a href="/edit/{{ guest.id }}">Изменить</a>
+    {% endif %}
+    {% if can_delete %}
+        <a href="/delete/{{ guest.id }}">Удалить</a>
+    {% endif %}
 {% endblock %}

@@ -130,5 +130,7 @@ STATICFILES_DIRS = [
     ('js', STATIC_ROOT / 'js'),
 ]
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 DB_PREFIX = 'acits'
