@@ -7,6 +7,23 @@
         {% endfor %}
     </ul>
 
+    {% if is_paginated %}
+        <div>
+            <div>
+                Показаны записи с {{ page_obj.start_index }} по {{ page_obj.end_index }}.
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </div>
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="/?page={{ page_obj.previous_page_number }}">Назад</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="/?page={{ page_obj.next_page_number }}">Вперед</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+
     {% if can_create %}
         <a href="/create/">Добавить</a>
     {% endif %}
