@@ -5,6 +5,8 @@
         {{ animal_form.as_p }}
         {% csrf_token %}
         <button type="submit">Сохранить</button>
-        <a href="/view/{{ animal_id }}/">Отмена</a>
+    </form>
+    <form action="/view/{{ animal_id }}/" method="get">
+        <button type="submit">Отмена</button>
     </form>
 {% endblock %}

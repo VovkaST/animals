@@ -25,9 +25,14 @@
         </tr>
     </table>
     {% if can_edit %}
-        <a href="/edit/{{ guest.id }}">Изменить</a>
+        <form action="/edit/{{ guest.id }}/" method="get">
+            <button type="submit">Изменить</button>
+        </form>
     {% endif %}
     {% if can_delete %}
-        <a href="/delete/{{ guest.id }}">Удалить</a>
+        <form action="/delete/{{ guest.id }}/" method="post">
+            {% csrf_token %}
+            <button type="submit">Удалить</button>
+        </form>
     {% endif %}
 {% endblock %}

@@ -78,7 +78,7 @@ class GuestsEditView(LoginRequiredMixin, View):
 
 
 class GuestsDelete(LoginRequiredMixin, View):
-    def get(self, request, animal_id):
+    def post(self, request, animal_id):
         if request.user.username.lower() != 'admin':
             raise Http404('<h1>Page not found</h1>')
         animal = Animals.objects.get(id=animal_id)
