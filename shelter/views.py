@@ -27,7 +27,7 @@ class GuestsDetailView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
-        animal = get_object_or_404(Animals, id=kwargs['pk'])
+        animal = get_object_or_404(Animals, id=kwargs['pk'], is_deleted=False)
         result.context_data['can_edit'] = False
         result.context_data['can_delete'] = False
         result.context_data['animal_form'] = AnimalsForm(instance=animal)
@@ -55,7 +55,7 @@ class GuestsCreateView(LoginRequiredMixin, View):
 
 class GuestsEditView(LoginRequiredMixin, View):
     def get(self, request, animal_id):
-        animal = Animals.objects.get(id=animal_id)
+        animal = get_object_or_404(Animals, id=animal_id, is_deleted=False)
         context = {
             'animal_form': AnimalsForm(instance=animal),
             'animal_id': animal_id,
