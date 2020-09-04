@@ -11,22 +11,30 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import environ
 import pathlib
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+root = environ.Path(__file__) - 2
+env = environ.Env()
+environ.Env.read_env()
 
-BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = root()
+TEMPLATES_DIR = root.path('templates')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'wqf-(q1&-#-90wgu^!2t*^yr2_1d!t8tl3x6x(bav3zi)1%3f2'
+try:
+    SECRET_KEY = env.str('DJANGO_SECRET_KEY')
+except Exception as exc:
+    print(exc)
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = []
 
@@ -60,7 +68,7 @@ ROOT_URLCONF = 'animals.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,10 +88,11 @@ WSGI_APPLICATION = 'animals.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'db.sqlite3'),
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': str(BASE_DIR / 'db.sqlite3'),
+    # }
+    'default': env.db('DATABASE_URL')
 }
 DB_PREFIX = 'acits'
 
@@ -127,13 +136,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_ROOT = root.path('static')
+STATIC_URL = env.str('STATIC_URL', default='/static/')
 
-STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = [
-    ('css', STATIC_ROOT / 'css'),
-    ('images', STATIC_ROOT / 'images'),
-    ('js', STATIC_ROOT / 'js'),
+    ('css', STATIC_ROOT('css')),
+    ('fonts', STATIC_ROOT('fonts')),
+    ('images', STATIC_ROOT('images')),
+    ('js', STATIC_ROOT('js')),
 ]
 
 

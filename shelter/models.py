@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
-from animals.settings.base import DB_PREFIX
+from animals.settings import DB_PREFIX
 
 
 class Animals(models.Model):
