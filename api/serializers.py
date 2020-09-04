@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Animals
+from shelter.models import Animals
 
 
 class AnimalsViewSerializer(ModelSerializer):

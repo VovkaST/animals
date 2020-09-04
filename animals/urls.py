@@ -22,5 +22,5 @@ urlpatterns = [
     path('', include('shelter.urls')),
     path('user/login/', views.LoginView.as_view(), name='login'),
     path('user/logout/', views.LogoutView.as_view(), name='logout'),
-    path('api/', include('shelter.urls_api')),
+    path('api/', include('api.urls')),
 ]
