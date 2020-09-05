@@ -7,7 +7,23 @@ from shelter.models import Animals
 from .forms import AnimalsForm
 
 
-class GuestsListView(generic.ListView):
+class ShelterView:
+    @staticmethod
+    def is_user_in_group(user, group_name):
+        return group_name in (group.name.lower() for group in user.groups.all())
+
+    def is_admin(self, user):
+        return self.is_user_in_group(user=user, group_name='admins')
+
+    def is_user(self, user):
+        return self.is_user_in_group(user=user, group_name='users')
+
+
+class ShelterCRUDView(ShelterView, LoginRequiredMixin, View):
+    pass
+
+
+class GuestsListView(ShelterView, generic.ListView):
     model = Animals
     queryset = Animals.objects.filter(is_deleted=False)
     context_object_name = 'guests_list'
@@ -15,30 +31,24 @@ class GuestsListView(generic.ListView):
 
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
-        result.context_data['can_create'] = False
-        if request.user.username.lower() in ('admin', 'user'):
-            result.context_data['can_create'] = True
+        result.context_data['can_create'] = any((self.is_admin(user=request.user), self.is_user(user=request.user)))
         return result
 
 
-class GuestsDetailView(generic.DetailView):
+class GuestsDetailView(ShelterView, generic.DetailView):
     model = Animals
     context_object_name = 'guest'
 
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
         animal = get_object_or_404(Animals, id=kwargs['pk'], is_deleted=False)
-        result.context_data['can_edit'] = False
-        result.context_data['can_delete'] = False
+        result.context_data['can_edit'] = any((self.is_admin(user=request.user), self.is_user(user=request.user)))
+        result.context_data['can_delete'] = self.is_admin(user=request.user)
         result.context_data['animal_form'] = AnimalsForm(instance=animal)
-        if request.user.username.lower() in ('admin', 'user'):
-            result.context_data['can_edit'] = True
-        if request.user.username.lower() == 'admin':
-            result.context_data['can_delete'] = True
         return result
 
 
-class GuestsCreateView(LoginRequiredMixin, View):
+class GuestsCreateView(ShelterCRUDView):
     def get(self, request):
         context = {
             'animal_form': AnimalsForm(),
@@ -53,7 +63,7 @@ class GuestsCreateView(LoginRequiredMixin, View):
         return render(request, template_name='shelter/animals_create.html', context={'animal_form': animal_form})
 
 
-class GuestsEditView(LoginRequiredMixin, View):
+class GuestsEditView(ShelterCRUDView):
     def get(self, request, animal_id):
         animal = get_object_or_404(Animals, id=animal_id, is_deleted=False)
         context = {
@@ -77,9 +87,9 @@ class GuestsEditView(LoginRequiredMixin, View):
         return render(request, template_name='shelter/animals_edit.html', context=context)
 
 
-class GuestsDelete(LoginRequiredMixin, View):
+class GuestsDelete(ShelterCRUDView):
     def post(self, request, animal_id):
-        if request.user.username.lower() != 'admin':
+        if self.is_admin(user=request.user):
             raise Http404('<h1>Page not found</h1>')
         animal = Animals.objects.get(id=animal_id)
         animal.soft_delete()

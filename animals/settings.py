@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import environ
-import pathlib
+from django.core.exceptions import ImproperlyConfigured
 
 root = environ.Path(__file__) - 2
 env = environ.Env()
@@ -29,8 +29,7 @@ TEMPLATES_DIR = root.path('templates')
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
     SECRET_KEY = env.str('DJANGO_SECRET_KEY')
-except Exception as exc:
-    print(exc)
+except ImproperlyConfigured:
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -88,10 +87,6 @@ WSGI_APPLICATION = 'animals.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': str(BASE_DIR / 'db.sqlite3'),
-    # }
     'default': env.db('DATABASE_URL')
 }
 DB_PREFIX = 'acits'
