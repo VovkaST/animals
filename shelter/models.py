@@ -10,6 +10,7 @@ from shelter.validators import gt_current_date_validator
 
 
 class NotDeletedManager(models.Manager):
+    """ Менеджер, возвращающий только те записи, у которых нет отметки об удалении """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
 
@@ -18,7 +19,8 @@ class Animals(models.Model):
     """ Животные, помещенные в приют """
 
     name = models.CharField(max_length=100, verbose_name='Кличка')
-    birth_date = models.DateField(null=True, verbose_name='Дата рождения', validators=(gt_current_date_validator,))
+    birth_date = models.DateField(null=True, verbose_name='Дата рождения',
+                                  validators=(gt_current_date_validator,))
     arrive_date = models.DateField(default=timezone.now, verbose_name='Дата прибытия в приют',
                                    validators=(gt_current_date_validator,))
     weight = models.FloatField(default=0, verbose_name='Вес', validators=(MinValueValidator(0.1), ))
@@ -35,6 +37,7 @@ class Animals(models.Model):
     def __str__(self):
         return self.name
 
+    @property
     def age(self):
         delta = relativedelta(datetime.now(), self.birth_date)
         if delta.years:
