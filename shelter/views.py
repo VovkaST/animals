@@ -31,7 +31,7 @@ class GuestsListView(ShelterView, generic.ListView):
 
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
-        result.context_data['can_create'] = any((self.is_admin(user=request.user), self.is_user(user=request.user)))
+        result.context_data['can_create'] = request.user.is_authenticated
         return result
 
 
@@ -42,7 +42,7 @@ class GuestsDetailView(ShelterView, generic.DetailView):
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
         animal = get_object_or_404(Animals, id=kwargs['pk'], is_deleted=False)
-        result.context_data['can_edit'] = any((self.is_admin(user=request.user), self.is_user(user=request.user)))
+        result.context_data['can_edit'] = request.user.is_authenticated
         result.context_data['can_delete'] = self.is_admin(user=request.user)
         result.context_data['animal_form'] = AnimalsForm(instance=animal)
         return result
