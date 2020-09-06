@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -13,6 +14,36 @@ class NotDeletedManager(models.Manager):
     """ Менеджер, возвращающий только те записи, у которых нет отметки об удалении """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
+
+
+class Shelter(models.Model):
+    title = models.CharField(max_length=100, verbose_name='Название приюта')
+    address = models.CharField(null=True, blank=True, max_length=250, verbose_name='Адрес')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
+    modified_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения записи')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = f'{DB_PREFIX}_shelters'
+        verbose_name = 'Приют'
+        verbose_name_plural = 'Приюты'
+
+
+class ShelterUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='User')
+    shelter = models.OneToOneField(Shelter, on_delete=models.CASCADE, verbose_name='Приют', related_name='Shelter')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
+
+    def __str__(self):
+        return f'{self.user} ({self.shelter})'
+
+    class Meta:
+        db_table = f'{DB_PREFIX}_user'
+        ordering = ['user']
+        verbose_name = 'Дополнительная информация о пользователе'
+        verbose_name_plural = 'Дополнительная информация о пользователе'
 
 
 class Animals(models.Model):
@@ -55,5 +86,5 @@ class Animals(models.Model):
     class Meta:
         db_table = f'{DB_PREFIX}_animals'
         ordering = ['-created_at']
-        verbose_name = 'Постояльцы приюта'
+        verbose_name = 'Постоялец приюта'
         verbose_name_plural = 'Постояльцы приюта'
