@@ -29,10 +29,11 @@ class APIAnimals(ShelterView, APIView):
         иначе - запись с указанным id.
         """
         pk = kwargs.get('pk', None)
+        shelter = self.get_current_user_shelter()
         if pk:
-            records = Animals.actual_objects.filter(id=pk)
+            records = Animals.actual_objects.filter(id=pk, shelter=shelter)
         else:
-            records = Animals.actual_objects
+            records = Animals.actual_objects.filter(shelter=shelter)
         serializer = AnimalsViewSerializer(records, many=True)
         return Response({'animals': serializer.data})
 
@@ -53,7 +54,8 @@ class APIAnimals(ShelterView, APIView):
         if not request.user.is_authenticated:
             return self.json_response(message='Access denied!', success=False, status=401)
         try:
-            record = Animals.actual_objects.get(id=pk)
+            shelter = self.get_current_user_shelter()
+            record = Animals.actual_objects.get(id=pk, shelter=shelter)
             data = request.data.get('animals')
             serializer = AnimalsEditSerializer(instance=record, data=data, partial=True)
             if serializer.is_valid():
@@ -71,7 +73,8 @@ class APIAnimals(ShelterView, APIView):
         elif not self.is_admin(user=request.user):
             return self.json_response(message='Permission denied!', success=False, status=403)
         try:
-            animal = Animals.actual_objects.get(id=pk)
+            shelter = self.get_current_user_shelter()
+            animal = Animals.actual_objects.get(id=pk, shelter=shelter)
             animal.soft_delete()
             return self.json_response(message='Record with id={} was successfully deleted'.format(pk))
         except Animals.DoesNotExist:

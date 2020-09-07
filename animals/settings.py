@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shelter',
+    'api',
+    'users',
     'rest_framework',
     'rest_framework.authtoken',
 ]
@@ -60,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'animals.middleware.request_user.CurrentUserMiddleware',
 ]
 
 ROOT_URLCONF = 'animals.urls'

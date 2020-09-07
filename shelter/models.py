@@ -1,11 +1,11 @@
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
-from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+from animals.middleware.request_user import get_current_user
 from animals.settings import DB_PREFIX
 from shelter.validators import gt_current_date_validator
 
@@ -17,7 +17,8 @@ class NotDeletedManager(models.Manager):
 
 
 class Shelter(models.Model):
-    title = models.CharField(max_length=100, verbose_name='Название приюта')
+    """ Модель приюта """
+    title = models.CharField(max_length=100, verbose_name='Название')
     address = models.CharField(null=True, blank=True, max_length=250, verbose_name='Адрес')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
     modified_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения записи')
@@ -31,23 +32,8 @@ class Shelter(models.Model):
         verbose_name_plural = 'Приюты'
 
 
-class ShelterUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='User')
-    shelter = models.OneToOneField(Shelter, on_delete=models.CASCADE, verbose_name='Приют', related_name='Shelter')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
-
-    def __str__(self):
-        return f'{self.user} ({self.shelter})'
-
-    class Meta:
-        db_table = f'{DB_PREFIX}_user'
-        ordering = ['user']
-        verbose_name = 'Дополнительная информация о пользователе'
-        verbose_name_plural = 'Дополнительная информация о пользователе'
-
-
 class Animals(models.Model):
-    """ Животные, помещенные в приют """
+    """ Модель животного, помещенного в приют """
 
     name = models.CharField(max_length=100, verbose_name='Кличка')
     birth_date = models.DateField(null=True, verbose_name='Дата рождения',
@@ -57,6 +43,7 @@ class Animals(models.Model):
     weight = models.FloatField(default=0, verbose_name='Вес', validators=(MinValueValidator(0.1), ))
     height = models.FloatField(default=0, verbose_name='Рост', validators=(MinValueValidator(0.1), ))
     special_signs = models.CharField(max_length=1000, blank=True, verbose_name='Особые приметы')
+    shelter = models.ForeignKey(Shelter, null=True, on_delete=models.CASCADE, verbose_name='Приют')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
     modified_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения записи')
     is_deleted = models.BooleanField(default=False, verbose_name='Отметка об удалении')
@@ -79,9 +66,19 @@ class Animals(models.Model):
             return f'{delta.days} дней'
 
     def soft_delete(self):
+        """ Мягкое удаление записи (проставление отметки is_deleted = True без физического удаления) """
         self.is_deleted = True
         self.deleted_at = datetime.now()
         self.save()
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        """ Сохранение записи и проставление связи с Приютом, связанным с пользователем """
+        from users.models import ShelterUser
+        if not self.shelter:
+            self.shelter = ShelterUser.objects.get(user=get_current_user()).shelter
+        super(Animals, self).save(force_insert=force_insert, force_update=force_update,
+                                  using=using, update_fields=update_fields)
 
     class Meta:
         db_table = f'{DB_PREFIX}_animals'

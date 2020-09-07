@@ -24,7 +24,7 @@
         </div>
     {% endif %}
 
-    {% if can_create %}
+    {% if request.user.is_authenticated %}
         <a href="/create/">Добавить</a>
     {% endif %}
 

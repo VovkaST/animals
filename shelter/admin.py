@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import Animals, ShelterUser, Shelter
+from users.models import ShelterUser
+from .models import Animals, Shelter
 
 admin.site.unregister(User)
 
@@ -15,7 +16,7 @@ class UserInline(admin.StackedInline):
 
 @admin.register(Shelter)
 class ShelterAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['title', 'address']
 
 
 @admin.register(User)

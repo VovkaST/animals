@@ -3,7 +3,9 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.views import generic, View
 
+from animals.middleware.request_user import get_current_user
 from shelter.models import Animals
+from users.models import ShelterUser
 from .forms import AnimalsForm
 
 
@@ -12,6 +14,12 @@ class ShelterView:
     def is_admin(user):
         return 'admins' in (group.name.lower() for group in user.groups.all())
 
+    @staticmethod
+    def get_current_user_shelter():
+        user = get_current_user()
+        if user:
+            return ShelterUser.objects.get(user=user).shelter
+
 
 class ShelterCRUDView(ShelterView, LoginRequiredMixin, View):
     pass
@@ -19,14 +27,13 @@ class ShelterCRUDView(ShelterView, LoginRequiredMixin, View):
 
 class GuestsListView(ShelterView, generic.ListView):
     model = Animals
-    queryset = Animals.actual_objects.get_queryset()
     context_object_name = 'guests_list'
     paginate_by = 10
 
     def get(self, request, *args, **kwargs):
-        result = super().get(request, *args, **kwargs)
-        result.context_data['can_create'] = request.user.is_authenticated
-        return result
+        shelter = self.get_current_user_shelter()
+        self.queryset = Animals.actual_objects.get_queryset().filter(shelter=shelter)
+        return super().get(request, *args, **kwargs)
 
 
 class GuestsDetailView(ShelterView, generic.DetailView):
@@ -35,8 +42,8 @@ class GuestsDetailView(ShelterView, generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
-        animal = Animals.actual_objects.get(id=kwargs['pk'])
-        result.context_data['can_edit'] = request.user.is_authenticated
+        shelter = self.get_current_user_shelter()
+        animal = Animals.actual_objects.get(id=kwargs['pk'], shelter=shelter)
         result.context_data['can_delete'] = self.is_admin(user=request.user)
         result.context_data['animal_form'] = AnimalsForm(instance=animal)
         return result
@@ -59,7 +66,8 @@ class GuestsCreateView(ShelterCRUDView):
 
 class GuestsEditView(ShelterCRUDView):
     def get(self, request, animal_id):
-        animal = Animals.actual_objects.get(id=animal_id)
+        shelter = self.get_current_user_shelter()
+        animal = Animals.actual_objects.get(id=animal_id, shelter=shelter)
         context = {
             'animal_form': AnimalsForm(instance=animal),
             'animal_id': animal_id,
@@ -69,7 +77,8 @@ class GuestsEditView(ShelterCRUDView):
     def post(self, request, animal_id=None):
         animal = None
         if animal_id:
-            animal = Animals.actual_objects.get(id=animal_id)
+            shelter = self.get_current_user_shelter()
+            animal = Animals.actual_objects.get(id=animal_id, shelter=shelter)
         animal_form = AnimalsForm(request.POST, instance=animal)
         if animal_form.is_valid():
             animal.save()
@@ -85,6 +94,7 @@ class GuestsDelete(ShelterCRUDView):
     def post(self, request, animal_id):
         if self.is_admin(user=request.user):
             raise Http404('<h1>Page not found</h1>')
-        animal = Animals.actual_objects.get(id=animal_id)
+        shelter = self.get_current_user_shelter()
+        animal = Animals.actual_objects.get(id=animal_id, shelter=shelter)
         animal.soft_delete()
         return HttpResponseRedirect('/')

@@ -24,7 +24,7 @@
             <td>{{ animal_form.instance.arrive_date|date:'d.m.Y' }}</td>
         </tr>
     </table>
-    {% if can_edit %}
+    {% if request.user.is_authenticated %}
         <form action="/edit/{{ guest.id }}/" method="get">
             <button type="submit">Изменить</button>
         </form>
