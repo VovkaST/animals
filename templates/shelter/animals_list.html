@@ -1,4 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'shelter/base.html' %}
+
+{% block guests %}{% endblock %}
+
 {% block content %}
     <h1>Список постояльцев</h1>
     <ul>
@@ -24,8 +27,7 @@
         </div>
     {% endif %}
 
-    {% if request.user.is_authenticated %}
-        <a href="/create/">Добавить</a>
-    {% endif %}
-
 {% endblock %}
+
+{% block guest_save %}{% endblock %}
+{% block cancel %}{% endblock %}

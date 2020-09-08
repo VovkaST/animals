@@ -1,12 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'shelter/base.html' %}
+
 {% block content %}
-    <a href="/">Назад к списку</a>
-    <form action="/edit/{{ animal_id }}/" method="post">
+    <form action="/edit/{{ animal_id }}/" method="post" id="main_form">
         {{ animal_form.as_p }}
         {% csrf_token %}
-        <button type="submit">Сохранить</button>
-    </form>
-    <form action="/view/{{ animal_id }}/" method="get">
-        <button type="submit">Отмена</button>
     </form>
 {% endblock %}

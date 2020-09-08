@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'shelter/base.html' %}
+
 {% block content %}
-    <a href="/">Назад к списку</a>
     <h1>{{ animal_form.instance.name }}</h1>
     <table>
         <tr>
@@ -24,15 +24,6 @@
             <td>{{ animal_form.instance.arrive_date|date:'d.m.Y' }}</td>
         </tr>
     </table>
-    {% if can_edit %}
-        <form action="/edit/{{ guest.id }}/" method="get">
-            <button type="submit">Изменить</button>
-        </form>
-    {% endif %}
-    {% if can_delete %}
-        <form action="/delete/{{ guest.id }}/" method="post">
-            {% csrf_token %}
-            <button type="submit">Удалить</button>
-        </form>
-    {% endif %}
 {% endblock %}
+
+{% block guest_save %}{% endblock %}

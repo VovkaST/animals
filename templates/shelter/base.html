@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block controls_top %}
+    {% block guests %}
+        <a href="/" role="button" class="btn btn-secondary">Все постояльцы</a>
+    {% endblock %}
+
+    {% block guest_create %}
+        <a href="/create/" role="button" class="btn btn-secondary">Добавить</a>
+    {% endblock %}
+
+    {% block guest_edit %}
+        {% if can_edit %}
+            <a href="/edit/{{ guest.id }}/" role="button" class="btn btn-secondary">Изменить</a>
+        {% endif %}
+    {% endblock %}
+
+{% endblock %}
+
+{% block controls_bottom %}
+    <div class="btn-group" role="group">
+
+        {% block guest_delete %}
+            {% if can_delete %}
+                <button type="submit" form="delete_form" class="btn btn-danger">Удалить</button>
+            {% endif %}
+        {% endblock %}
+
+        {% block guest_save %}
+            <button type="submit" form="main_form" class="btn btn-primary">Сохранить</button>
+        {% endblock %}
+
+        {% block cancel %}
+            <a href="/" class="btn btn-primary">Отмена</a>
+        {% endblock %}
+
+    </div>
+    {% if can_delete %}
+        <form action="/delete/{{ guest.id }}/" method="post" id="delete_form">
+            {% csrf_token %}
+        </form>
+    {% endif %}
+{% endblock %}

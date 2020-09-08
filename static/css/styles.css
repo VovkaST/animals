@@ -1,0 +1,33 @@
+.fixed-container {
+    width: 1024px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+.authorization {
+    margin: 40px auto;
+    padding: 20px 20px;
+    width: 400px;
+    border: 1px solid #cecece;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+.authorization__header {
+    margin-bottom: 20px;
+}
+.authorization__row {
+    margin: 0 0 15px;
+}
+.authorization__row:last-child {
+    margin-bottom: 0;
+}
+.controls__top {
+    margin-bottom: 20px;
+}
+.controls__bottom {
+    margin-top: 20px;
+}
+.errorlist {
+    border: 1px solid #ffbebe;
+    background-color: #ffd4d4;
+}

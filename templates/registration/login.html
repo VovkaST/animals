@@ -1,5 +1,23 @@
-<form action="/user/login/" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Вход</button>
-</form>
+{% extends 'base.html' %}
+
+{% block logout %}{% endblock %}
+
+{% block content %}
+    <div class="authorization container">
+        <h1 class="authorization__header row justify-content-center">Авторизация</h1>
+        <form action="/user/login/" method="post" class="">
+            {% csrf_token %}
+            <div class="row justify-content-between authorization__row">
+                <label for="id_username">Имя пользователя:</label>
+                <input type="text" name="username" autofocus required id="id_username">
+            </div>
+            <div class="row justify-content-between authorization__row">
+                <label for="id_password">Пароль:</label>
+                <input type="password" name="password" required id="id_password">
+            </div>
+            <div class="row justify-content-end authorization__row">
+                <button type="submit" class="btn btn-dark">Вход</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
