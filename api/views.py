@@ -8,12 +8,13 @@ from .serializers import AnimalsViewSerializer, AnimalsEditSerializer
 
 class APIAnimals(ShelterView, APIView):
 
-    def json_response(self, message, success=True, status=None):
+    @staticmethod
+    def json_response(message, success=True, status=None):
         """
         Формирование ответа в формате JSON
 
         :param str message: Сообщение о результате обработки запроса
-        :param bool success: Булевое значение успешности запроса
+        :param bool success: Булевое значение успешности выполнения запроса
         :param int status: Код состояния HTTP
         :return: Объект Response
         """
@@ -28,6 +29,8 @@ class APIAnimals(ShelterView, APIView):
         Просмотр записей. Если не задан pk, возвращается список всех записей,
         иначе - запись с указанным id.
         """
+        if not request.user.is_authenticated:
+            return self.json_response(message='Access denied!', success=False, status=401)
         pk = kwargs.get('pk', None)
         shelter = self.get_current_user_shelter()
         if pk:
@@ -53,6 +56,8 @@ class APIAnimals(ShelterView, APIView):
         """ Изменение записи по id """
         if not request.user.is_authenticated:
             return self.json_response(message='Access denied!', success=False, status=401)
+        if not self.can_edit(user=request.user):
+            return self.json_response(message='Operation is forbidden!', success=False, status=403)
         try:
             shelter = self.get_current_user_shelter()
             record = Animals.actual_objects.get(id=pk, shelter=shelter)
@@ -70,7 +75,7 @@ class APIAnimals(ShelterView, APIView):
         """ Удаление записи по id """
         if not request.user.is_authenticated:
             return self.json_response(message='Access denied!', success=False, status=401)
-        elif not self.is_admin(user=request.user):
+        if not self.is_admin(user=request.user):
             return self.json_response(message='Permission denied!', success=False, status=403)
         try:
             shelter = self.get_current_user_shelter()

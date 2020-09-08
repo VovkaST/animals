@@ -3,7 +3,7 @@ from threading import local
 _user = local()
 
 
-class CurrentUserMiddleware(object):
+class CurrentUserMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
